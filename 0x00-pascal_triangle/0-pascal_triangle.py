@@ -3,17 +3,19 @@ This is the main module that runs the pascal code
 """
 
 
-def pascal_triangle(rows):
+def pascal_triangle(n):
     """
     working on pascal...
     """
-    if type(rows) != int:
+    if type(n) != int:
         return
+    if n <= 0:
+        return []
 
     result_rows = []
     park2 = [1]
 
-    for row in range(rows):
+    for row in range(n):
         if row != 0:
             park1 = park2
             new_park = [1, 1]
