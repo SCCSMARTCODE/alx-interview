@@ -35,4 +35,4 @@ For this project, you will need a solid understanding of several key concepts in
 By reviewing these concepts and utilizing these resources, you will be well-equipped to develop an efficient solution for this project, applying both your algorithmic thinking and Python programming skills.
 
 - Additional Resources
-	- [Mock Technical Interview] (https://www.youtube.com/watch?v=V8DGdPkBBxg)
+	- [Mock Technical Interview](https://www.youtube.com/watch?v=V8DGdPkBBxg)
