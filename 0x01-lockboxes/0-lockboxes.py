@@ -17,8 +17,7 @@ def canUnlockAll(boxes):
             available_keys.extend(box)
         else:
             for y in available_keys:
-                if boxes[y]:
-                    if x + 1 in boxes[y]:
-                        return True
+                if x + 1 in boxes[y]:
+                    return True
             return False
     return True
