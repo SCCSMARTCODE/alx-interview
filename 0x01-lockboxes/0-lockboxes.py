@@ -9,15 +9,16 @@ def canUnlockAll(boxes):
     :return:
     """
 
-    if len(boxes) <= 1:
-        return True
-    available_keys = boxes[0]
-    for x, box in enumerate(boxes[1:]):
-        if x + 1 in available_keys:
-            available_keys.extend(box)
-        else:
-            for y in available_keys:
-                if x + 1 in boxes[y]:
-                    return True
-            return False
-    return True
+    position = 0
+    unlocked = {}
+
+    for box in boxes:
+        if len(box) == 0 or position == 0:
+            unlocked[position] = "always_unlocked"
+        for key in box:
+            if key < len(boxes) and key != position:
+                unlocked[key] = key
+        if len(unlocked) == len(boxes):
+            return True
+        position += 1
+    return False
