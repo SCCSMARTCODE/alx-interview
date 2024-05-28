@@ -2,6 +2,7 @@
 """
 This is the module that contains stats functionality code
 """
+
 import sys
 import signal
 
@@ -45,7 +46,6 @@ try:
         # Check if the line format matches the expected pattern
         if len(parts) < 9 or parts[4] != '"GET' or parts[5] != '/projects/260' or parts[6] != 'HTTP/1.1"':
             continue
-
         try:
             # Extract the status code and file size from the appropriate parts
             status_code = int(parts[7])
