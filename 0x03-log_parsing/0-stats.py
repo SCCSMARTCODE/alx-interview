@@ -67,6 +67,7 @@ try:
         # Print statistics every 10 lines
         if line_count % 10 == 0:
             print_stats()
+    print_stats()
 except KeyboardInterrupt:
     # Print statistics and exit gracefully on Ctrl+C
     print_stats()
