@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+This is the module that contains stats functionality code
+"""
 import sys
 import signal
 
