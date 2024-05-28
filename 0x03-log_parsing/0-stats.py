@@ -1,90 +1,70 @@
 #!/usr/bin/python3
-"""A script for parsing HTTP request logs.
-"""
-import re
+import sys
+import signal
+
+# Initialize the total size of files
+total_size = 0
+
+# Dictionary to count the occurrences of specific status codes
+status_counts = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+
+# Counter for the number of processed lines
+line_count = 0
 
 
-def extract_input(input_line):
-    """Extracts sections of a line of an HTTP request log.
+def print_stats():
     """
-    fp = (
-        r'\s*(?P<ip>\S+)\s*',
-        r'\s*\[(?P<date>\d+\-\d+\-\d+ \d+:\d+:\d+\.\d+)\]',
-        r'\s*"(?P<request>[^"]*)"\s*',
-        r'\s*(?P<status_code>\S+)',
-        r'\s*(?P<file_size>\d+)'
-    )
-    info = {
-        'status_code': 0,
-        'file_size': 0,
-    }
-    log_fmt = '{}\\-{}{}{}{}\\s*'.format(fp[0], fp[1], fp[2], fp[3], fp[4])
-    resp_match = re.fullmatch(log_fmt, input_line)
-    if resp_match is not None:
-        status_code = resp_match.group('status_code')
-        file_size = int(resp_match.group('file_size'))
-        info['status_code'] = status_code
-        info['file_size'] = file_size
-    return info
-
-
-def print_statistics(total_file_size, status_codes_stats):
-    """Prints the accumulated statistics of the HTTP request log.
+    Print the current statistics: total file size and counts of status codes.
     """
-    print('File size: {:d}'.format(total_file_size), flush=True)
-    for status_code in sorted(status_codes_stats.keys()):
-        num = status_codes_stats.get(status_code, 0)
-        if num > 0:
-            print('{:s}: {:d}'.format(status_code, num), flush=True)
+    print(f"File size: {total_size}")
+    for status in sorted(status_counts):
+        if status_counts[status] > 0:
+            print(f"{status}: {status_counts[status]}")
 
 
-def update_metrics(line, total_file_size, status_codes_stats):
-    """Updates the metrics from a given HTTP request log.
-
-    Args:
-        :param line: 
-        :param status_codes_stats:
-        :param total_file_size:
-
-    Returns:
-        int: The new total file size.
+def signal_handler(sig, frame):
     """
-    line_info = extract_input(line)
-    status_code = line_info.get('status_code', '0')
-    if status_code in status_codes_stats.keys():
-        status_codes_stats[status_code] += 1
-    return total_file_size + line_info['file_size']
-
-
-def run():
-    """Starts the log parser.
+    Signal handler for SIGINT (Ctrl+C). Prints the current statistics and exits.
     """
-    line_num = 0
-    total_file_size = 0
-    status_codes_stats = {
-        '200': 0,
-        '301': 0,
-        '400': 0,
-        '401': 0,
-        '403': 0,
-        '404': 0,
-        '405': 0,
-        '500': 0,
-    }
-    try:
-        while True:
-            line = input()
-            total_file_size = update_metrics(
-                line,
-                total_file_size,
-                status_codes_stats,
-            )
-            line_num += 1
-            if line_num % 10 == 0:
-                print_statistics(total_file_size, status_codes_stats)
-    except (KeyboardInterrupt, EOFError):
-        print_statistics(total_file_size, status_codes_stats)
+    print_stats()
+    sys.exit(0)
 
 
-if __name__ == '__main__':
-    run()
+# Set up the signal handler to catch SIGINT (Ctrl+C)
+signal.signal(signal.SIGINT, signal_handler)
+
+try:
+    # Process each line from standard input
+    for line in sys.stdin:
+        # Split the line into parts based on whitespace
+        parts = line.split()
+
+        # Check if the line format matches the expected pattern
+        if len(parts) < 9 or parts[4] != '"GET' or parts[5] != '/projects/260' or parts[6] != 'HTTP/1.1"':
+            continue
+
+        try:
+            # Extract the status code and file size from the appropriate parts
+            status_code = int(parts[7])
+            file_size = int(parts[8])
+        except (ValueError, IndexError):
+            # Skip the line if conversion fails or parts are missing
+            continue
+
+        # Accumulate the total file size
+        total_size += file_size
+
+        # Increment the count for the status code if it is one of the tracked codes
+        if status_code in status_counts:
+            status_counts[status_code] += 1
+
+        # Increment the line counter
+        line_count += 1
+
+        # Print statistics every 10 lines
+        if line_count % 10 == 0:
+            print_stats()
+except KeyboardInterrupt:
+    # Print statistics and exit gracefully on Ctrl+C
+    print_stats()
+    sys.exit(0)
