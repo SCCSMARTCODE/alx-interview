@@ -4,7 +4,7 @@ This is the module that contains the rotate_2d_matrix function definition
 """
 
 
-def rotate_2d_matrix(matrix: list[list, ...]) -> None:
+def rotate_2d_matrix(matrix):
     """
     This function rotates a matrix
     :param matrix:
