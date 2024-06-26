@@ -14,7 +14,8 @@ def island_perimeter(grid):
         for col in range(len(grid[0])):
             if grid[row][col] == 1:
                 perimeter += 4
-                check_points = [(row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
+                check_points = [(row + 1, col), (row - 1, col),
+                                (row, col + 1), (row, col - 1)]
                 for point in check_points:
                     try:
                         if -1 in point:
